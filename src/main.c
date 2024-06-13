@@ -7,7 +7,7 @@
 const char* usage_msg = 
     "Usage: %s [options] <Dateiname>\n"
     "Options:\n"
-    "-c, --cycles <Zahl>             Die Anzahl der Zyklen, die simuliert werden sollen.\n"
+    "-c, --cycles <Zahl>         Die Anzahl der Zyklen, die simuliert werden sollen.\n"
     "--directmapped              Simuliert einen direkt assoziativen Cache.\n"
     "--fourway                   Simuliert einen vierfach assoziativen Cache.\n"
     "--cacheline-size <Zahl>     Die Größe einer Cachezeile in Byte.\n"

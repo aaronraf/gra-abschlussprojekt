@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/u/halle/tham/home_at/2. Semester/GRA/systemc"
+                "${workspaceFolder}/../systemc/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
