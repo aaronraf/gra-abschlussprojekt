@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdbool.h>
 
 const char* usage_msg = 
     "Usage: %s [options] <Dateiname>\n"
@@ -51,8 +52,8 @@ int main(int argc, char const* argv[]) {
     int opt;
     int option_index = 0;
     int cycles = 0;
-    int direct_mapped = 0;
-    int fourway = 0;
+    bool direct_mapped = false;
+    bool fourway = false;
     int cacheline_size = 0;
     int cachelines = 0;
     int cache_latency = 0;
@@ -83,9 +84,9 @@ int main(int argc, char const* argv[]) {
             exit(EXIT_SUCCESS);
         case 0:
             if (strcmp(long_options[option_index].name, "directmapped") == 0) {
-                direct_mapped = 1;
+                direct_mapped = true;
             } else if (strcmp(long_options[option_index].name, "fourway") == 0) {
-                fourway = 1;
+                fourway = true;
             } else if (strcmp(long_options[option_index].name, "cacheline-size") == 0) {
                 cacheline_size = fetch_num;
             } else if (strcmp(long_options[option_index].name, "cachelines") == 0) {
