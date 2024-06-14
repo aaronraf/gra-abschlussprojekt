@@ -3,9 +3,13 @@
 
 #include <systemc>
 #include <queue>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
 #include "structs.hpp"
 
 using namespace sc_core;
+using namespace std;
 
 SC_MODULE(CACHE) {
     sc_in<Request[]> request;
@@ -15,9 +19,9 @@ SC_MODULE(CACHE) {
 
     // variables from run_simulation
     int cycles;
-    // int directMapped;
-    // unsigned cacheLines;
-    // unsigned cacheLineSize;
+    int directMapped;
+    unsigned cacheLines;
+    unsigned cacheLineSize;
     // unsigned cacheLatency;
     // unsigned memoryLatency;
     // size_t numRequests;
@@ -30,23 +34,27 @@ SC_MODULE(CACHE) {
 
     void update() {
         cycles++;
+        vector<int> address = splitAddress();
 
     }
 
     void write() {
-
+        
     }
 
     void read() {
 
     }
 
-    // index 0: tag bits
-    // index 1: index bits
-    // index 2: offset bits
-    int[] splitAddress() {
-        return 
-    }
-}
+    vector<int> splitAddress() {
+        vector<int> array(3);
+        unsigned cacheSize = cacheLines * cacheLineSize;
 
-#endif 
+        array[2] = cacheLineSize / 2;                                       // offset bits
+        array[1] = directMapped == 1 ? cacheLines / 2 : cacheLines / 8;     // index bits
+        array[0] = cacheSize - array[1] - array[2];                         // tag bits
+        return array;
+    }
+};
+
+#endif
