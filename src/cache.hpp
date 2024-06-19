@@ -4,27 +4,40 @@
 #include <systemc>
 #include <queue>
 #include "structs.hpp"
+#include <cmath>
 
 using namespace sc_core;
 
 SC_MODULE(CACHE) {
-    sc_in<Request[]> request;
+    Request request[100];
     sc_out<Result> result;
     int index_counter;
     sc_in<bool> clk;
 
     // variables from run_simulation
     int cycles;
-    // int directMapped;
-    // unsigned cacheLines;
-    // unsigned cacheLineSize;
-    // unsigned cacheLatency;
-    // unsigned memoryLatency;
+    int directMapped;
+    unsigned cacheLines;
+    unsigned cacheLineSize;
+    unsigned cacheLatency;
+    unsigned memoryLatency;
     // size_t numRequests;
     // struct Request requests[numRequests];
     // const char* tracefile;
 
     SC_CTOR(CACHE) {
+        // parse address
+        int number_of_index_bits =  ceil(log2((directMapped == 1) ? cacheLines : cacheLines / 4));
+        int number_of_offset_bits = ceil(log2(cacheLineSize));
+        int number_of_tag_bits = (cacheLines * cacheLineSize) - number_of_index_bits - number_of_offset_bits;
+
+        // 
+
+
+
+
+
+
         SC_CTHREAD(update, clk.pos());
     };
 
