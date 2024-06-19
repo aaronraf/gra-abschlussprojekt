@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include "structs.hpp"
+#include <cmath>
 
 using namespace sc_core;
 using namespace std;
@@ -44,16 +45,6 @@ SC_MODULE(CACHE) {
 
     void read() {
 
-    }
-
-    vector<int> splitAddress() {
-        vector<int> array(3);
-        unsigned cacheSize = cacheLines * cacheLineSize;
-
-        array[2] = cacheLineSize / 2;                                       // offset bits
-        array[1] = directMapped == 1 ? cacheLines / 2 : cacheLines / 8;     // index bits
-        array[0] = cacheSize - array[1] - array[2];                         // tag bits
-        return array;
     }
 };
 
