@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <unordered_map>
 
+using namespace std;
+
 struct Request {
     uint32_t addr;
     uint32_t data;
