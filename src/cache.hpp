@@ -7,12 +7,15 @@
 #include <unordered_map>
 #include "main_memory.hpp"
 
+typdef struct TagLRUPair tagLRUPair;
+
 using namespace sc_core;
 using namespace std;
 
 struct TagLRUPair {
     int tag;
-    int usage_freq;
+    int offset;
+    int usage_frequency;
 };
 
 SC_MODULE(CACHE) {
@@ -48,6 +51,10 @@ SC_MODULE(CACHE) {
         number_of_offset_bits = (int) pow(2, ceil(log2(cacheLineSize)));
         number_of_tag_bits = 4;
 
+        for (int i = 0; i < cacheLines; i++) {
+            tagLRUPair[i] = new TagLRUPair;
+            tagLRUPair[i].usage_frequency = i % 4;
+        }
 
         SC_CTHREAD(update, clk.pos());
     };
@@ -62,31 +69,43 @@ SC_MODULE(CACHE) {
         }
     }
 
+
     void write(Request request) {
         int address = request.addr;
         int data = request.data;
         int offset = address & number_of_offset_bits;
         int index = (address >> number_of_offset_bits) & number_of_index_bits;
-        int tag = index >> number_of_index_bits;
-        TagLRUPair[index * 4 ]
+        int tag = index >> number_of_index_bits;        // tag of address yg kita mau write
+        bool dataFound = false;
+        int offset_LRU = 0;
+        
         for (int i = 0; i < 4; i++) {
-            if (tag == parsedCacheLine[index][i]) {
+            if (tag == tagLRUPair[index * 4 + i].tag) {
+                dataFound = true;
                 result.hits++;
                 parsedCacheLine[index][i][offset] = data;
             }
-            tagLRUPair.usage_frequency[i * index + tag]++;
+            tagLRUPair[index * 4 + i].usage_frequency++;
         }
 
-        int minLRU = tagLRUPair.usage_frequency[index * 4];
-        int minLRU_tag;
+        if (dataFound) {
+            return;
+        }
+
+        TagLRUPair minLRU = tagLRUPair[index * 4];
+        int tagindexintaglrupair = index*4;
         for (int i = index * 4 + 1; i < index * 4 + 4; i++) {
-            if (minLRU > tagLRUPair.usage_frequency[i]) {
-                minLRU = tagLRUPair.usage_frequency[i];
-                minLRU_tag = parsedCacheLine[index][i % 4];
+            if (minLRU.usage_frequency > tagLRUPair[i].usage_frequency) {
+                minLRU.usage_frequency = tagLRUPair[i].usage_frequency;
+                tagindexintaglrupair = i;
+
             }
         }
+        
         result.misses++;
-        replace(minLRU, request, index);
+        replace(minLRU, request, index, tagindexintaglrupair, offset);
+
+        parsedCacheLine[index][tagindexintaglrupair][offset] = data;
     }
 
     byte read(Request request) {
@@ -112,20 +131,24 @@ SC_MODULE(CACHE) {
         replace();
         return parsedCacheLine[index][minLRU][offset];
     }
-};
 
-    int replace(int minLRU, Request request, int index) {
+    // rep
+    void replace(TagLRUPair minLRU, Request request, int index, int tag_index_but_in_lru_pair, int offset_of_req_address) {
+        // write enable
         if (request.we) {
-            int dataAsAWhole = 0;
-            int address_minLRU = 
-            if (dataAsAWhole != main_memory[request.addr]) {
-                main_memory[request.addr] = dataAsAWhole;
+            // check data coherence between min lru in cache and ram
+            int address_lru = 0 | (minLRU.tag << number_of_index_bits) | (index << number_of_offset_bits) | offset_LRU;
+            if (main_memory[address_lru] != parsedCacheLine[index][tag_index_but_in_lru_pair % 4][minLRU.offset]) {
+                main_memory[address_lru] = parsedCacheLine[index][tag_index_but_in_lru_pair % 4][minLRU.offset];
             }
-        }
+
+            // get the new data in request from ram and put it to cache
+            parsedCacheLine[index][tag_index_but_in_lru_pair % 4] = main_memory[request.addr];
+        } 
         else {
             parsedCacheLine[index][minLRU] = main_memory[request.addr];
         }
     }
-}
+};
 
 #endif
