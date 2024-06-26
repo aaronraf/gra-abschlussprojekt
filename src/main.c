@@ -77,12 +77,14 @@ char* read_csv(const char* csv_path) {
     if (fread(content, 1, file_info.st_size, csv_file) != (size_t) file_info.st_size) {
         fprintf(stderr, "Error reading file!");
         free(content);
+        content = NULL;
         fclose(csv_file);
         return NULL;
     }
 
     // null terminate
     content[file_info.st_size] = '\0';
+    return content;
 }
 
 int main(int argc, char const* argv[]) {
@@ -167,7 +169,7 @@ int main(int argc, char const* argv[]) {
         }
     }
 
-    printf("%s", csv_content);
+    printf("%s\n", csv_content);
     // printf(csv_content);
 
     return 0;
