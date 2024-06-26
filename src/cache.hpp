@@ -31,23 +31,6 @@ SC_MODULE(CACHE) {
     unsigned cacheLineSize;
     unsigned cacheLatency;
     unsigned memoryLatency;
-    // size_t numRequests;
-    // struct Request requests[numRequests];
-    // const char* tracefile;
-
-    SC_CTOR(CACHE) {
-        // parse address
-        int number_of_index_bits =  ceil(log2((directMapped == 1) ? cacheLines : cacheLines / 4));
-        int number_of_offset_bits = ceil(log2(cacheLineSize));
-        int number_of_tag_bits = (cacheLines * cacheLineSize) - number_of_index_bits - number_of_offset_bits;
-
-        // 
-
-
-
-
-
-
     size_t numRequests;
     struct Request requests[numRequests];
     const char* tracefile;
