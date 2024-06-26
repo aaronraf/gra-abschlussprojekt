@@ -37,8 +37,7 @@ private:
         // TODO: sc_bv<8> data[number_of_offset];
         int data[NUMBER_OF_OFFSET];
         int map_key; // tag bits of map
-        // TODO: update is_first_time accordingly
-        bool is_first_time;
+        bool is_first_time; // flag for cold misses
         Node* next;
         Node* prev;
 
@@ -194,8 +193,8 @@ int main() {
     int value1 = cache.read_from_cache(0); // Read value from address 0
     int value2 = cache.read_from_cache(4); // Read value from address 4
 
-    std::cout << "Value at address 0: " << value1 << std::endl; // Expected output: 10
-    std::cout << "Value at address 4: " << value2 << std::endl; // Expected output: 20
+    cout << "Value at address 0: " << value1 << endl; // Expected output: 10
+    cout << "Value at address 4: " << value2 << endl; // Expected output: 20
 
     return 0;
 }

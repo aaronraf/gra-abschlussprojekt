@@ -7,18 +7,18 @@
 
 using namespace std;
 
-struct Request {
-    uint32_t addr;
-    uint32_t data;
-    int we;         // 0 for read, 1 for write
-};
+// struct Request {
+//     uint32_t addr;
+//     uint32_t data;
+//     int we;         // 0 for read, 1 for write
+// };
 
-struct Result {
-    size_t cycles;
-    size_t misses;
-    size_t hits;
-    size_t primitiveGateCount;
-};
+// struct Result {
+//     size_t cycles;
+//     size_t misses;
+//     size_t hits;
+//     size_t primitiveGateCount;
+// };
 
 class LRU {
 private:
