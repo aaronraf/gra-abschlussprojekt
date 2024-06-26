@@ -10,11 +10,16 @@
 #include <unordered_map>
 #include <tuple>
 #include <cmath>
+#include <algorithm> // std::fill()
+#include "main_memory.cpp"
 using namespace std;
 
 // TODO: adjust, shouldn't be hardcoded
 const int NUMBER_OF_OFFSET = 4;
 int number_of_offset = 5, number_of_index = 5;
+
+// TODO: delete this
+MainMemory main_memory;
 
 struct CacheAddress {
     // TODO: change data type
@@ -28,7 +33,7 @@ struct CacheAddress {
         index = (address >> number_of_offset) & number_of_index;
         tag = index >> number_of_index; 
     }
-}
+};
 
 class LRUCache {
 private:
@@ -36,7 +41,7 @@ private:
     public:
         // TODO: sc_bv<8> data[number_of_offset];
         int data[NUMBER_OF_OFFSET];
-        int key;
+        int map_key; // tag bits of map
         bool is_first_time;
         Node* next;
         Node* prev;
@@ -49,7 +54,7 @@ private:
     Node* head; // head = MRU
     Node* tail; // tail = LRU
     
-    void pushToHead(Node* node); // move LRU to MRU
+    void push_to_head(Node* node); // move LRU to MRU
     void add(Node* node);
     void remove(Node* node);
         
@@ -62,23 +67,21 @@ public:
     ~LRUCache(); // destructor: ensure delete all nodes to avoid memory leaks
 
     // TODO: sc_bv<8> read(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset)
-    int read_from_cache(int address, int offset);
+    int read_from_cache(int address);
 
     // TODO : void write(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset, sc_bv<8> data)
     void write_to_cache(int address, int data_to_write);
 
-    void replace_lru();
+    void replace_lru(int address, int cache_address_tag);
 };
 
 
 LRUCache::Node::Node() : next(nullptr), prev(nullptr) {
-    for (int i = 0; i < NUMBER_OF_OFFSET; ++i) {
-        data[i] = 0; 
-    }
+    fill(data, data + number_of_offset, 0); // initialize array to 0
     is_first_time = true;
 }
 
-void LRUCache::pushToHead(Node* node) {
+void LRUCache::push_to_head(Node* node) {
     remove(node);
     add(node);
 }
@@ -106,7 +109,8 @@ LRUCache::LRUCache() {
 
     // add 4 nodes and set each of these to become the value of map (key doesn't matter here since the node is_first_time is true)
     for (int i = 0; i < NUMBER_OF_OFFSET; i++) {
-        Node* node = new Node(); 
+        Node* node = new Node();
+        node->map_key = i; 
         add(node);
         map[i] = node; //equivalent to map.insert(make_pair(i, node));
     }
@@ -123,30 +127,47 @@ LRUCache::~LRUCache() {
 
 int LRUCache::read_from_cache(int address) {
     CacheAddress cache_address(address);
-    // if not found or found but first time: fetch data from ram put it to lru
+    // not found    
     if (map.find(cache_address.tag) == map.end() || (map[cache_address.tag] != nullptr && map[cache_address.tag]->is_first_time)) { // map.find() returns map.end() if not found
-        lru_replace();
+        replace_lru(address, cache_address.tag);
     }
-    // read from lru
+    // read from lru and update lru to mru
     Node* node = map[cache_address.tag]; 
-    pushToHead(node);                        // replace O(1)
+    push_to_head(node);                        // replace O(1)
     return node->data[cache_address.offset]; // read O(1)
 }
 
-void LRUCache::write_to_cache(int index, int tag, int offset, int data_to_write) {
-    // found: write, move LRU to MRU
-    if (map.find(tag) != map.end()) {
-        replace_lru();
+void LRUCache::write_to_cache(int address, int data_to_write) {
+    CacheAddress cache_address(address);
+    // not found
+    if (map.find(cache_address.tag) == map.end() || (map[cache_address.tag] != nullptr && map[cache_address.tag]->is_first_time)) {
+        replace_lru(address, cache_address.tag);
     }
-    Node* node = map[tag];
-    node->data[offset] = data_to_write; // write O(1)
-    pushToHead(node);                   // replace O(1)
+    // write to lru and ram and update lru to mru
+    Node* node = map[cache_address.tag];
+    node->data[cache_address.offset] = data_to_write;   // write O(1)
+    main_memory.write_to_ram(address, data_to_write);               // write-through: write directly to memory
+    push_to_head(node);                                   // replace O(1)
 }
 
-
-void LRUCache::replace_lru() {
+void LRUCache::replace_lru(int address, int cache_address_tag) {
+    // replace lru node with new node at lru place (tail)
     Node* lru_node = tail->prev;
-    
+    Node* new_node = new Node();
+    new_node->next = tail;
+    new_node->prev = lru_node->prev;
+    lru_node->prev->next = new_node;
+    tail->prev = new_node;
+
+    // update map_key
+    new_node->map_key = cache_address_tag;
+
+    // delete entry of lrunode of map and add the new one
+    map.erase(lru_node->map_key);
+    map[cache_address_tag] = new_node;
+
+    delete lru_node;
+
     // get appropriate 4 (number_of_offset) byte data from ram
     // 1 -> 0 1 2 3    1 / 4 = 0   0 * 4 = 0     fetch 0 - 3
     // 2 -> 0 1 2 3    2 / 4 = 0   0 * 4 = 0     fetch 0 - 3
@@ -154,18 +175,24 @@ void LRUCache::replace_lru() {
     // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
     int start_address_to_fetch = (address / number_of_offset) * number_of_offset ;
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
-
     for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
-        lru_node->data[offset] = read_from_ram[ram_address];
-    }
-
-    // update tag bits in map
-    for (auto iter = map.begin(); iter != map.end(); ++iter) {  // O(1)
-        if (iter->second == lru_node) {
-            map.erase(iter->first);
-            map[cache_address.tag] = lru_node;
-            break;
-        }
+        new_node->data[offset] = main_memory.read_from_ram(ram_address);
     }
 }
 
+int main() {
+    // Create an instance of LRUCache
+    LRUCache cache;
+
+    // Test read and write operations
+    cache.write_to_cache(0, 10); // Write value 10 to address 0
+    cache.write_to_cache(4, 20); // Write value 20 to address 4
+
+    int value1 = cache.read_from_cache(0); // Read value from address 0
+    int value2 = cache.read_from_cache(4); // Read value from address 4
+
+    std::cout << "Value at address 0: " << value1 << std::endl; // Expected output: 10
+    std::cout << "Value at address 4: " << value2 << std::endl; // Expected output: 20
+
+    return 0;
+}
