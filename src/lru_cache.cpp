@@ -8,71 +8,6 @@
 #include "lru_cache.hpp"
 using namespace std;
 
-<<<<<<< Updated upstream
-// TODO: adjust, shouldn't be hardcoded
-const int NUMBER_OF_OFFSET = 4;
-int number_of_offset = 5, number_of_index = 5;
-
-// TODO: delete this
-MainMemory main_memory;
-
-struct CacheAddress {
-    // TODO: change data type
-    int index; 
-    int tag;
-    int offset;
-
-    // TODO: change data type;
-    CacheAddress(int address) {
-        offset = address & number_of_offset;
-        index = (address >> number_of_offset) & number_of_index;
-        tag = index >> number_of_index; 
-    }
-};
-
-class LRUCache {
-private:
-    class Node {
-    public:
-        // TODO: sc_bv<8> data[number_of_offset];
-        int data[NUMBER_OF_OFFSET];
-        int map_key; // tag bits of map
-        bool is_first_time; // flag for cold misses
-        Node* next;
-        Node* prev;
-
-        Node(); // constructor: initialize all data to 0 and is_first_time to true
-    };
-
-    // TODO: unordered_map<sc_bv<8>, Node*> map;
-    unordered_map<int, Node*> map; // int = tag_bits
-    Node* head; // head = MRU
-    Node* tail; // tail = LRU
-    
-    void push_to_head(Node* node); // move LRU to MRU
-    void add(Node* node);
-    void remove(Node* node);
-        
-public:
-    // doubly linkedlist: head - 4 nodes - tail with O(1) replace
-    // map: {key 1: node 1 ; key 2: node 2; key 3: node 3 ; key 4: node 4} with O(1) read/write
-
-    LRUCache(); // constructor: initialize linkedlist and map
-    
-    ~LRUCache(); // destructor: ensure delete all nodes to avoid memory leaks
-
-    // TODO: sc_bv<8> read(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset)
-    int read_from_cache(int address);
-
-    // TODO : void write(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset, sc_bv<8> data)
-    void write_to_cache(int address, int data_to_write);
-
-    void replace_lru(int address, int cache_address_tag);
-};
-
-
-=======
->>>>>>> Stashed changes
 LRUCache::Node::Node() : next(nullptr), prev(nullptr) {
     fill(data, data + number_of_offset, 0); // initialize array to 0
     is_first_time = true;
@@ -181,6 +116,7 @@ void LRUCache::replace_lru(int address, int cache_address_tag) {
     // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
     int start_address_to_fetch = (address / number_of_offset) * number_of_offset;
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
+    
     for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
         new_node->data[offset] = main_memory.read_from_ram(ram_address);
     }
