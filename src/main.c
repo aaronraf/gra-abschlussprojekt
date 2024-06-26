@@ -43,7 +43,7 @@
 // }
 
 char* read_csv(const char* csv_path) {
-    FILE* csv_file = fopen(csv_path, 'r');
+    FILE* csv_file = fopen(csv_path, "r");
     if (csv_file == NULL) {
         fprintf(stderr, "Error, can't open file!\n");
         return NULL;
@@ -76,6 +76,7 @@ char* read_csv(const char* csv_path) {
     // read file content and save it in "content"
     if (fread(content, 1, file_info.st_size, csv_file) != (size_t) file_info.st_size) {
         fprintf(stderr, "Error reading file!");
+        free(content);
         fclose(csv_file);
         return NULL;
     }
@@ -160,8 +161,14 @@ int main(int argc, char const* argv[]) {
         }
     } else {
         csv_content = read_csv(csv_filename);
-        printf("%s.*", csv_content);
+        if (csv_content) {
+            printf("%s", csv_content);
+            free(csv_content);
+        }
     }
+
+    printf("%s", csv_content);
+    // printf(csv_content);
 
     return 0;
 }
