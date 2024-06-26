@@ -4,12 +4,12 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
-#include <cstdint>
+// #include <cstdint>
 #include <sys/stat.h>
 
 struct Request {
-    uint32_t addr;
-    uint32_t data;
+    unsigned addr;
+    unsigned data;
     int we;         // 0 for read, 1 for write
 };
 
@@ -101,19 +101,33 @@ char* read_csv(const char* csv_path) {
     return content;
 }
 
-void parse_data(const char* content) {
+void parse_data(const char* content, Request request[], int number_of_requests) {
     char* content_copy = strdup(content);   // copy of the content to avoid modifying the original
     if (content_copy == NULL) {
         fprintf(stderr, "Error, .csv file does not have any content.");
         exit(EXIT_FAILURE);
     }
     
-    char* data;
-    char* line = strtok_r(content_copy, "\n", &data);
+    char* rest;
+    char* line = strtok_r(content_copy, "\n", &rest);
 
-    while (line != NULL) {
-        data = 
-        line = strtok_r(NULL, "\n", &data)
+    for (int i = 0; i < number_of_requests && line != NULL; i++) {
+        char temp[2];     // Allocate space for "W" or "R" and null-byte terminator
+        unsigned int addr;
+        int data;
+
+        sscanf(line, "%1s,%x,%d", temp, &addr, &data);
+        data = temp[0] == 'W' ? data : 0;
+
+        // printf("Temp: %s\n", temp);
+        // printf("Addr: %x\n", addr);
+        // printf("Data: %d\n", data);
+
+        request[i].we = temp;
+        request[i].addr = addr;
+        request[i].data = data;
+
+        line = strtok_r(NULL, "\n", &rest);
     }
 
     free(content_copy);
@@ -122,10 +136,10 @@ void parse_data(const char* content) {
 int main(int argc, char const* argv[]) {
     const char* progname = argv[0];
     
-    if (argc == 1) {
-        print_usage(progname);
-        return EXIT_FAILURE;
-    }
+    // if (argc == 1) {
+    //     print_usage(progname);
+    //     return EXIT_FAILURE;
+    // }
 
     int opt;
     int option_index = 0;
@@ -200,9 +214,10 @@ int main(int argc, char const* argv[]) {
             free(csv_content);
         }
     }
-
     printf("%s\n", csv_content);
-    // printf(csv_content);
+    
+    // TODO: replace 3 with request array's actual size
+    parse_data(csv_content, 3);
 
     return 0;
 }
