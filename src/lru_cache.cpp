@@ -1,9 +1,4 @@
 // 4-Way Associative Cache //
-/*
-    Assumption for this simulation
-    1. there is only a single cache and ram
-    2. user always access data from cache first, never directly to ram
-*/ 
 
 #include <iostream>
 // TODO: #include <systemc>
@@ -42,6 +37,7 @@ private:
         // TODO: sc_bv<8> data[number_of_offset];
         int data[NUMBER_OF_OFFSET];
         int map_key; // tag bits of map
+        // TODO: update is_first_time accordingly
         bool is_first_time;
         Node* next;
         Node* prev;
@@ -128,8 +124,12 @@ LRUCache::~LRUCache() {
 int LRUCache::read_from_cache(int address) {
     CacheAddress cache_address(address);
     // not found    
-    if (map.find(cache_address.tag) == map.end() || (map[cache_address.tag] != nullptr && map[cache_address.tag]->is_first_time)) { // map.find() returns map.end() if not found
+    if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
         replace_lru(address, cache_address.tag);
+    }
+    if (map[cache_address.tag]->is_first_time) {
+        replace_lru(address, cache_address.tag);
+        // TODO: update first time
     }
     // read from lru and update lru to mru
     Node* node = map[cache_address.tag]; 
@@ -139,14 +139,17 @@ int LRUCache::read_from_cache(int address) {
 
 void LRUCache::write_to_cache(int address, int data_to_write) {
     CacheAddress cache_address(address);
-    // not found
-    if (map.find(cache_address.tag) == map.end() || (map[cache_address.tag] != nullptr && map[cache_address.tag]->is_first_time)) {
+    if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
         replace_lru(address, cache_address.tag);
+    }
+    if (map[cache_address.tag]->is_first_time) {
+        replace_lru(address, cache_address.tag);
+        // TODO: update first time
     }
     // write to lru and ram and update lru to mru
     Node* node = map[cache_address.tag];
-    node->data[cache_address.offset] = data_to_write;   // write O(1)
-    main_memory.write_to_ram(address, data_to_write);               // write-through: write directly to memory
+    node->data[cache_address.offset] = data_to_write;       // write O(1)
+    main_memory.write_to_ram(address, data_to_write);     // write-through: write directly to memory
     push_to_head(node);                                   // replace O(1)
 }
 
@@ -173,7 +176,7 @@ void LRUCache::replace_lru(int address, int cache_address_tag) {
     // 2 -> 0 1 2 3    2 / 4 = 0   0 * 4 = 0     fetch 0 - 3
     // 5 -> 4 5 6 7    5 / 4 = 1   1 * 4 = 4     fetch 4 - 7
     // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
-    int start_address_to_fetch = (address / number_of_offset) * number_of_offset ;
+    int start_address_to_fetch = (address / number_of_offset) * number_of_offset;
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
     for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
         new_node->data[offset] = main_memory.read_from_ram(ram_address);

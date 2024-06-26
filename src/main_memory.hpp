@@ -10,5 +10,4 @@ SC_MODULE(MAIN_MEMORY) {
     int index_counter = 0;
     unordered_map<uint32_t, int> frequency_map;
     sc_in<bool> clk;
- 
 }

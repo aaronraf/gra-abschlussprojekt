@@ -10,7 +10,6 @@ private:
     int memory[MEMORY_SIZE];
 
 public: 
-
     int read_from_ram(int address) {
         if (address < 0 || address >= MEMORY_SIZE) {
             cerr << "Error: Invalid memory address " << address << endl;
