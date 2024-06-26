@@ -144,28 +144,28 @@ void LRUCache::write_to_cache(int index, int tag, int offset, int data_to_write)
 }
 
 
-    void LRUCache::replace_lru() {
-        Node* lru_node = tail->prev;
-        
-        // get appropriate 4 (number_of_offset) byte data from ram
-        // 1 -> 0 1 2 3    1 / 4 = 0   0 * 4 = 0     fetch 0 - 3
-        // 2 -> 0 1 2 3    2 / 4 = 0   0 * 4 = 0     fetch 0 - 3
-        // 5 -> 4 5 6 7    5 / 4 = 1   1 * 4 = 4     fetch 4 - 7
-        // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
-        int start_address_to_fetch = (address / number_of_offset) * number_of_offset ;
-        int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
+void LRUCache::replace_lru() {
+    Node* lru_node = tail->prev;
+    
+    // get appropriate 4 (number_of_offset) byte data from ram
+    // 1 -> 0 1 2 3    1 / 4 = 0   0 * 4 = 0     fetch 0 - 3
+    // 2 -> 0 1 2 3    2 / 4 = 0   0 * 4 = 0     fetch 0 - 3
+    // 5 -> 4 5 6 7    5 / 4 = 1   1 * 4 = 4     fetch 4 - 7
+    // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
+    int start_address_to_fetch = (address / number_of_offset) * number_of_offset ;
+    int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
 
-        for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
-            lru_node->data[offset] = read_from_ram[ram_address];
-        }
+    for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
+        lru_node->data[offset] = read_from_ram[ram_address];
+    }
 
-        // update tag bits in map
-        for (auto iter = map.begin(); iter != map.end(); ++iter) {  // O(1)
-            if (iter->second == lru_node) {
-                map.erase(iter->first);
-                map[cache_address.tag] = lru_node;
-                break;
-            }
+    // update tag bits in map
+    for (auto iter = map.begin(); iter != map.end(); ++iter) {  // O(1)
+        if (iter->second == lru_node) {
+            map.erase(iter->first);
+            map[cache_address.tag] = lru_node;
+            break;
         }
     }
 }
+
