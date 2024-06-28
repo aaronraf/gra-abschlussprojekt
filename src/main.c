@@ -101,7 +101,7 @@ char* read_csv(const char* csv_path) {
     return content;
 }
 
-void parse_data(const char* content, Request request[], int number_of_requests) {
+void parse_data(const char* content, int number_of_requests) {
     char* content_copy = strdup(content);   // copy of the content to avoid modifying the original
     if (content_copy == NULL) {
         fprintf(stderr, "Error, .csv file does not have any content.");
@@ -123,9 +123,9 @@ void parse_data(const char* content, Request request[], int number_of_requests) 
         // printf("Addr: %x\n", addr);
         // printf("Data: %d\n", data);
 
-        request[i].we = temp;
-        request[i].addr = addr;
-        request[i].data = data;
+        // request[i].we = temp;
+        // request[i].addr = addr;
+        // request[i].data = data;
 
         line = strtok_r(NULL, "\n", &rest);
     }
@@ -152,7 +152,7 @@ int main(int argc, char const* argv[]) {
     int memory_latency = 0;
     char* tf_filename = NULL;
     char* input_filename = NULL;
-    const char* csv_filename = "examples/inputs.csv";
+    const char* csv_path = "../examples/inputs.csv";
     char* csv_content;
 
     struct option long_options[] = {
@@ -203,12 +203,12 @@ int main(int argc, char const* argv[]) {
         input_filename = argv[optind];
     }
 
-    if (csv_filename) {
-        if(!(csv_content = read_csv(csv_filename))) {
+    if (csv_path) {
+        if(!(csv_content = read_csv(csv_path))) {
             return 1;
         }
     } else {
-        csv_content = read_csv(csv_filename);
+        csv_content = read_csv(csv_path);
         if (csv_content) {
             printf("%s", csv_content);
             free(csv_content);

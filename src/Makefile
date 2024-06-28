@@ -6,9 +6,9 @@
 C_SRCS = main.c
 CPP_SRCS = simulation.cpp
 
-# Object files
-C_OBJS = $(C_SRCS:.c=.o)
-CPP_OBJS = $(CPP_SRCS:.cpp=.o)
+# Object files located in the output directory outside src
+C_OBJS = $(patsubst %.c,../output/%.o,$(C_SRCS))
+CPP_OBJS = $(patsubst %.cpp,../output/%.o,$(CPP_SRCS))
 
 # Assignment task files
 # HEADERS := 
@@ -20,7 +20,7 @@ TARGET := cachesim
 SCPATH = ../../systemc
 
 # Additional flags for the compiler
-CXXFLAGS := -std=c++14  -I$(SCPATH)/include -L$(SCPATH)/lib -lsystemc -lm -Wall -Wextra
+CXXFLAGS := -std=c++14 -I$(SCPATH)/include -L$(SCPATH)/lib -lsystemc -lm -Wall -Wextra
 
 # ---------------------------------------
 # CONFIGURATION END
@@ -34,7 +34,7 @@ endif
 
 CC := $(shell command -v gcc || command -v clang)
 ifeq ($(strip $(CC)),)
-    $(error Neither clang nor g is available. Exiting.)
+    $(error Neither clang nor gcc is available. Exiting.)
 endif
 
 # Add rpath according to OS
@@ -51,12 +51,15 @@ endif
 # Default to release build for both app and library
 all: debug
 
+# Ensure the output directory exists
+$(shell mkdir -p ../output)
+
 # Rule to compile .c files to .o files
-%.o: %.c
+../output/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Rule to compile .cpp files to .o files
-%.o: %.cpp
+../output/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Debug build
@@ -74,6 +77,6 @@ $(TARGET): $(C_OBJS) $(CPP_OBJS)
 # Clean up
 clean:
 	rm -f $(TARGET)
-	rm -rf *.o
+	rm -rf ../output/*.o
 
 .PHONY: all debug release clean
