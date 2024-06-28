@@ -104,8 +104,8 @@ char* read_csv(const char* csv_path) {
     return content;
 }
 
-// void parse_data(const char* content, struct Request request[], int number_of_requests) {
-void parse_data(const char* content, int number_of_requests) {
+void parse_data(const char* content, struct Request request[], int number_of_requests) {
+// void parse_data(const char* content, int number_of_requests) {
     char* content_copy = strdup(content);   // copy of the content to avoid modifying the original
     if (content_copy == NULL) {
         fprintf(stderr, "Error, .csv file does not have any content.");
@@ -127,9 +127,9 @@ void parse_data(const char* content, int number_of_requests) {
         // printf("Addr: %x\n", addr);
         // printf("Data: %d\n", data);
 
-        // request[i].we = temp;
-        // request[i].addr = addr;
-        // request[i].data = data;
+        request[i].we = temp;
+        request[i].addr = addr;
+        request[i].data = data;
 
         line = strtok_r(NULL, "\n", &rest);
     }
@@ -158,6 +158,8 @@ int main(int argc, char const* argv[]) {
     char* input_filename = NULL;
     const char* csv_path = "../examples/inputs.csv";
     char* csv_content;
+    size_t num_requests = 256;
+    Request requests[numRequests];
 
     struct option long_options[] = {
         {"cycles", required_argument, 0, 'c'},
@@ -220,10 +222,14 @@ int main(int argc, char const* argv[]) {
     }
     printf("%s\n", csv_content);
     
-    // TODO: replace 3 with request array's actual size
-    parse_data(csv_content, 3);
+    // TODO: add request array as second parameter and replace 3 with request array's actual size
+    parse_data(csv_content, requests, num_requests);
 
-    Result result = run_simulation(cycles, cachelines, cacheline_size, cache_latency, memory_latency, tf_filename, input_filename);
+    Result result = run_simulation(cycles, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename, input_filename);
+    printf("Cycles: %zu\n", result.cycles);
+    printf("Misses: %zu\n", result.misses);
+    printf("Hits: %zu\n", result.hits);
+    printf("Primitive Gate Count: %zu\n", result.primitiveGateCount);
 
     return 0;
 }

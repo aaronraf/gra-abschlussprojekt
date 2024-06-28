@@ -29,7 +29,7 @@ SC_MODULE(CACHE) {
     Cache* cache; 
 
     SC_CTOR(CACHE);
-    CACHE(int cycles, int directMapped, unsigned cacheLines, unsigned cacheLineSize,
+    CACHE(sc_module name, int cycles, int directMapped, unsigned cacheLines, unsigned cacheLineSize,
             unsigned cacheLatency, unsigned memoryLatency, size_t numRequests,
                 Request request[], const char* tracefile) {
         
