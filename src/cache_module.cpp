@@ -1,6 +1,6 @@
 #include <systemc>
-#include "lru_cache.hpp"
-#include "main_memory.hpp"
+#include "../include/lru_cache.hpp"
+#include "../include/main_memory.hpp"
 
 SC_MODULE(CacheModule) {
     sc_in<bool> clk;

@@ -1,5 +1,5 @@
-#include "cache_address.hpp"
-#include "main_memory.cpp"
+#include "../include/cache_address.hpp"
+#include "../include/main_memory.hpp"
 #include "cache.cpp"
 
 MainMemory main_memory;

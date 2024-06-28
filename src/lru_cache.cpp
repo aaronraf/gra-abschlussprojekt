@@ -5,7 +5,7 @@
 #include <cmath>
 #include <algorithm> // std::fill()
 #include "main_memory.cpp"
-#include "lru_cache.hpp"
+#include "../include/lru_cache.hpp"
 using namespace std;
 
 LRUCache::Node::Node() : next(nullptr), prev(nullptr) {
