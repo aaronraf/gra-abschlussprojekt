@@ -1,3 +1,6 @@
+#ifndef CACHEADDRESS_HPP
+#define CACHEADDRESS_HPP
+
 // TODO: adjust, shouldn't be hardcoded
 const int NUMBER_OF_OFFSET = 4;
 int number_of_offset = 5, number_of_index = 5;
@@ -15,3 +18,5 @@ struct CacheAddress {
         tag = index >> number_of_index; 
     }
 };
+
+#endif

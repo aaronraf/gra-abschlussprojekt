@@ -1,9 +1,11 @@
 // 4-Way Associative Cache //
 #ifndef FourWayLRUCACHE_HPP
 #define FourWayLRUCACHE_HPP
+
 #include "cache_address.hpp"
 #include "cache_template.hpp"
 #include "main_memory.hpp"
+#include <unordered_map>
 
 // TODO: adjust, shouldn't be hardcoded
 const int NUMBER_OF_OFFSET = 4;

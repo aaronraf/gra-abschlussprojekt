@@ -1,3 +1,6 @@
+#ifndef STRUCTS_HPP
+#define STRUCTS_HPP
+
 #include <cstdint>
 #include <stdio.h>
 
@@ -13,3 +16,5 @@ typedef struct Result {
     size_t hits ;
     size_t primitiveGateCount ;
 } Result;
+
+#endif

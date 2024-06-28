@@ -57,7 +57,7 @@ FourWayLRUCache::~FourWayLRUCache() {
     }
 }
 
-int FourWayLRUCache::read_from_cache(int address) override {
+int FourWayLRUCache::read_from_cache(int address) {
     CacheAddress cache_address(address);
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
@@ -73,7 +73,7 @@ int FourWayLRUCache::read_from_cache(int address) override {
     return node->data[cache_address.offset]; // read O(1)
 }
 
-void FourWayLRUCache::write_to_cache(int address, int data_to_write) override {
+void FourWayLRUCache::write_to_cache(int address, int data_to_write) {
     CacheAddress cache_address(address);
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found

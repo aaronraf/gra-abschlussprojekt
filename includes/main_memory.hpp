@@ -1,3 +1,6 @@
+#ifndef MAINMEMORY_HPP
+#define MAINMEMORY_HPP
+
 #include <iostream>
 using namespace std;
 
@@ -25,3 +28,5 @@ public:
         memory[address] = data_to_write;
     }   
 };
+
+#endif
