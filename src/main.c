@@ -101,6 +101,7 @@ char* read_csv(const char* csv_path) {
     return content;
 }
 
+// void parse_data(const char* content, struct Request request[], int number_of_requests) {
 void parse_data(const char* content, int number_of_requests) {
     char* content_copy = strdup(content);   // copy of the content to avoid modifying the original
     if (content_copy == NULL) {
