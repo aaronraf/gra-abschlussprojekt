@@ -4,35 +4,35 @@
 #include <tuple>
 #include <cmath>
 #include <algorithm> // std::fill()
-#include "main_memory.cpp"
-#include "../include/lru_cache.hpp"
+#include "../includes/main_memory.hpp"
+#include "../includes/four_way_lru_cache.hpp"
 using namespace std;
 
-LRUCache::Node::Node() : next(nullptr), prev(nullptr) {
+FourWayLRUCache::Node::Node() : next(nullptr), prev(nullptr) {
     fill(data, data + number_of_offset, 0); // initialize array to 0
     is_first_time = true;
 }
 
-void LRUCache::push_to_head(Node* node) {
+void FourWayLRUCache::push_to_head(Node* node) {
     remove(node);
     add(node);
 }
 
-void LRUCache::add(Node* node) {
+void FourWayLRUCache::add(Node* node) {
     node->next = head->next;
     node->next->prev = node;
     node->prev = head;
     head->next = node;
 }
 
-void LRUCache::remove(Node* node) {
+void FourWayLRUCache::remove(Node* node) {
     Node* prev = node->prev;
     Node* next = node->next;
     prev->next = next;
     next->prev = prev;
 }
 
-LRUCache::LRUCache() {
+FourWayLRUCache::FourWayLRUCache() {
     // add head and tail
     head = new Node();
     tail = new Node();
@@ -48,7 +48,7 @@ LRUCache::LRUCache() {
     }
 }
 
-LRUCache::~LRUCache() {
+FourWayLRUCache::~FourWayLRUCache() {
     Node* current = head;
     while (current != nullptr) {
         Node* next = current->next;
@@ -57,7 +57,7 @@ LRUCache::~LRUCache() {
     }
 }
 
-int LRUCache::read_from_cache(int address) {
+int FourWayLRUCache::read_from_cache(int address) override {
     CacheAddress cache_address(address);
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
@@ -73,7 +73,7 @@ int LRUCache::read_from_cache(int address) {
     return node->data[cache_address.offset]; // read O(1)
 }
 
-void LRUCache::write_to_cache(int address, int data_to_write) {
+void FourWayLRUCache::write_to_cache(int address, int data_to_write) override {
     CacheAddress cache_address(address);
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
@@ -90,7 +90,7 @@ void LRUCache::write_to_cache(int address, int data_to_write) {
     push_to_head(node);                                     // replace O(1)
 }
 
-void LRUCache::replace_lru(int address, int cache_address_tag) {
+void FourWayLRUCache::replace_lru(int address, int cache_address_tag) {
     // replace lru node with new node at lru place (tail)
     Node* lru_node = tail->prev;
     Node* new_node = new Node();
@@ -123,8 +123,8 @@ void LRUCache::replace_lru(int address, int cache_address_tag) {
 }
 
 int main() {
-    // Create an instance of LRUCache
-    LRUCache cache;
+    // Create an instance of FourWayLRUCache
+    FourWayLRUCache cache;
 
     // Test read and write operations
     cache.write_to_cache(0, 10); // Write value 10 to address 0

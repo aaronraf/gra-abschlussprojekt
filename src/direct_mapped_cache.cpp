@@ -1,6 +1,6 @@
-#include "../include/cache_address.hpp"
-#include "../include/main_memory.hpp"
-#include "cache.cpp"
+#include "../includes/cache_address.hpp"
+#include "../includes/main_memory.hpp"
+#include "../includes/cache_template.hpp"
 
 MainMemory main_memory;
 
@@ -10,7 +10,7 @@ struct CacheEntry {
     int data[NUMBER_OF_OFFSET];
 };
 
-class DirectMapped : public Cache {
+class DirectMappedCache : public Cache {
 private:
     // TODO: change size to NoOfCacheLine
     CacheEntry cache_entry[100];
@@ -25,7 +25,7 @@ private:
     }
 
 public:
-    int read_from_cache(int address) {
+    int read_from_cache(int address) override {
         CacheAddress cache_address(address);
         CacheEntry current_entry = cache_entry[cache_address.index];
         
@@ -37,7 +37,7 @@ public:
         return current_entry.data[cache_address.offset];
     }
 
-    void write_to_cache(int address, int data_to_write) {
+    void write_to_cache(int address, int data_to_write) override {
         CacheAddress cache_address(address);
         CacheEntry current_entry = cache_entry[cache_address.index];
         
@@ -52,7 +52,7 @@ public:
 };
 
 int main() {
-    DirectMapped cache;
+    DirectMappedCache cache;
 
     // Example read and write operations
     int address_to_read = 0x12;     // Example address to read/write
