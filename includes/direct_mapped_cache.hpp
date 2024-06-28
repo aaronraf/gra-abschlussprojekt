@@ -1,16 +1,16 @@
 #ifndef DIRECTMAPPEDCACHE_HPP
 #define DIRECTMAPPEDCACHE_HPP
 
-#include "../includes/cache_address.hpp"
-#include "../includes/main_memory.hpp"
-#include "../includes/cache_template.hpp"
+#include "cache_address.hpp"
+#include "main_memory.hpp"
+#include "cache_template.hpp"
+#include "cache_config.hpp"
 
-MainMemory main_memory;
 
 struct CacheEntry {
     // TODO: change datatypes
     int tag;
-    int data[NUMBER_OF_OFFSET];
+    int data[100];
 };
 
 class DirectMappedCache : public Cache {
@@ -18,12 +18,12 @@ private:
     // TODO: change size to NoOfCacheLine
     CacheEntry cache_entry[100];
 
-    void replace(int address, CacheEntry current_entry);
+    void replace(int address, CacheEntry current_entry, int number_of_offset);
 
 public:
-    int read_from_cache(int address) override;
+    int read_from_cache(int address, CacheConfig cache_config) override;
 
-    void write_to_cache(int address, int data_to_write) override;
+    void write_to_cache(int address, CacheConfig cache_config, int data_to_write) override;
 };
 
 #endif

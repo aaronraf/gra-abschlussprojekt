@@ -1,9 +1,7 @@
 #ifndef CACHEADDRESS_HPP
 #define CACHEADDRESS_HPP
 
-// TODO: adjust, shouldn't be hardcoded
-const int NUMBER_OF_OFFSET = 4;
-int number_of_offset = 5, number_of_index = 5;
+#include "cache_config.hpp"
 
 struct CacheAddress {
     // TODO: change data type
@@ -11,11 +9,11 @@ struct CacheAddress {
     int tag;
     int offset;
 
-    // TODO: change data type; adjust for direct mapped
-    CacheAddress(int address) {
-        offset = address & number_of_offset;
-        index = (address >> number_of_offset) & number_of_index;
-        tag = index >> number_of_index; 
+    // TODO: change data type
+    CacheAddress(int address, CacheConfig cache_config) {
+        offset = address & cache_config.number_of_offset;
+        index = (address >> cache_config.number_of_offset) & cache_config.number_of_index;
+        tag = index >> cache_config.number_of_index; 
     }
 };
 

@@ -2,10 +2,10 @@
 #define CACHE_HPP
 
 #include <systemc>
-#include "../include/structs.hpp"
 #include <cmath>
 #include <unordered_map>
-#include "../include/main_memory.hpp"
+#include "../includes/structs.hpp"
+#include "../includes/main_memory.hpp"
 
 typdef struct TagLRUPair tagLRUPair;
 

@@ -1,11 +1,8 @@
-#include "../includes/cache_address.hpp"
-#include "../includes/main_memory.hpp"
-#include "../includes/cache_template.hpp"
 #include "../includes/direct_mapped_cache.hpp"
 
 MainMemory main_memory;
 
-void Direcreplace(int address, CacheEntry current_entry) {
+void DirectMappedCache::replace(int address, CacheEntry current_entry, int number_of_offset) {
     int start_address_to_fetch = (address / number_of_offset) * number_of_offset;
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
 
@@ -14,24 +11,24 @@ void Direcreplace(int address, CacheEntry current_entry) {
     }
 }
 
-int DirectMappedCache::read_from_cache(int address) {
-    CacheAddress cache_address(address);
+int DirectMappedCache::read_from_cache(int address, CacheConfig cache_config) {
+    CacheAddress cache_address(address, cache_config);
     CacheEntry current_entry = cache_entry[cache_address.index];
     
     if (current_entry.tag != cache_address.tag) {
-        replace(address, current_entry);
+        replace(address, current_entry, cache_config.number_of_offset);
         current_entry.tag = cache_address.tag;
     }
     
     return current_entry.data[cache_address.offset];
 }
 
-void DirectMappedCache::write_to_cache(int address, int data_to_write) {
-    CacheAddress cache_address(address);
+void DirectMappedCache::write_to_cache(int address, CacheConfig cache_config, int data_to_write) {
+    CacheAddress cache_address(address, cache_config);
     CacheEntry current_entry = cache_entry[cache_address.index];
     
     if (current_entry.tag != cache_address.tag) {
-        replace(address, current_entry);
+        replace(address, current_entry, cache_config.number_of_offset);
         current_entry.tag = cache_address.tag;
     }
     
