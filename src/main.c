@@ -4,11 +4,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
-<<<<<<< HEAD
 #include <stdint.h>
-=======
-// #include <cstdint>
->>>>>>> 5c0c603 (add parse string from .csv)
 #include <sys/stat.h>
 
 struct Request {
