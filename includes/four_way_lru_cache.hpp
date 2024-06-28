@@ -1,9 +1,11 @@
 // 4-Way Associative Cache //
-#ifndef LRUCACHE_HPP
-#define LRUCACHE_HPP
+#ifndef FourWayLRUCACHE_HPP
+#define FourWayLRUCACHE_HPP
+
 #include "cache_address.hpp"
-#include "cache.cpp"
-#include "main_memory.cpp"
+#include "cache_template.hpp"
+#include "main_memory.hpp"
+#include <unordered_map>
 
 // TODO: adjust, shouldn't be hardcoded
 const int NUMBER_OF_OFFSET = 4;
@@ -12,7 +14,7 @@ int number_of_offset = 5, number_of_index = 5;
 // TODO: delete this
 MainMemory main_memory;
 
-class LRUCache : public Cache {
+class FourWayLRUCache : public Cache {
 private:
     class Node {
     public:
@@ -39,15 +41,15 @@ public:
     // doubly linkedlist: head - 4 nodes - tail with O(1) replace
     // map: {key 1: node 1 ; key 2: node 2; key 3: node 3 ; key 4: node 4} with O(1) read/write
 
-    LRUCache(); // constructor: initialize linkedlist and map
+    FourWayLRUCache(); // constructor: initialize linkedlist and map
     
-    ~LRUCache(); // destructor: ensure delete all nodes to avoid memory leaks
+    ~FourWayLRUCache(); // destructor: ensure delete all nodes to avoid memory leaks
 
     // TODO: sc_bv<8> read(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset)
-    int read_from_cache(int address);
+    int read_from_cache(int address) override;
 
     // TODO : void write(sc_bv<number_of_tag> tag, sc_bv<number_of_offset> offset, sc_bv<8> data)
-    void write_to_cache(int address, int data_to_write);
+    void write_to_cache(int address, int data_to_write) override;
 
     void replace_lru(int address, int cache_address_tag);
 };
