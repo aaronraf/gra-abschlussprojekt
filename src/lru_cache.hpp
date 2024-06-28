@@ -2,6 +2,8 @@
 #ifndef LRUCACHE_HPP
 #define LRUCACHE_HPP
 #include "cache_address.hpp"
+#include "cache.cpp"
+#include "main_memory.cpp"
 
 // TODO: adjust, shouldn't be hardcoded
 const int NUMBER_OF_OFFSET = 4;
@@ -10,7 +12,7 @@ int number_of_offset = 5, number_of_index = 5;
 // TODO: delete this
 MainMemory main_memory;
 
-class LRUCache {
+class LRUCache : public Cache {
 private:
     class Node {
     public:

@@ -1,5 +1,6 @@
 #include "cache_address.hpp"
 #include "main_memory.cpp"
+#include "cache.cpp"
 
 MainMemory main_memory;
 
@@ -9,7 +10,7 @@ struct CacheEntry {
     int data[NUMBER_OF_OFFSET];
 };
 
-class DirectMapped {
+class DirectMapped : public Cache {
 private:
     // TODO: change size to NoOfCacheLine
     CacheEntry cache_entry[100];
