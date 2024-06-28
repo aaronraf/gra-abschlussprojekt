@@ -6,19 +6,22 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include "../includes/structs.hpp"
 
-struct Request {
-    unsigned addr;
-    unsigned data;
-    int we;         // 0 for read, 1 for write
-};
+extern Result run_simulation(int cycles, unsigned cachelines, unsigned cacheline_size, unsigned cache_latency, int memory_latency, const char* tf_filename, const char* input_filename);
 
-struct Result {
-    size_t cycles;
-    size_t misses;
-    size_t hits;
-    size_t primitiveGateCount;
-};
+// struct Request {
+//     unsigned addr;
+//     unsigned data;
+//     int we;         // 0 for read, 1 for write
+// };
+
+// struct Result {
+//     size_t cycles;
+//     size_t misses;
+//     size_t hits;
+//     size_t primitiveGateCount;
+// };
 
 const char* usage_msg = 
     "Usage: %s [options] <Dateiname>\n"
@@ -101,7 +104,8 @@ char* read_csv(const char* csv_path) {
     return content;
 }
 
-void parse_data(const char* content, struct Request request[], int number_of_requests) {
+// void parse_data(const char* content, struct Request request[], int number_of_requests) {
+void parse_data(const char* content, int number_of_requests) {
     char* content_copy = strdup(content);   // copy of the content to avoid modifying the original
     if (content_copy == NULL) {
         fprintf(stderr, "Error, .csv file does not have any content.");
@@ -218,6 +222,8 @@ int main(int argc, char const* argv[]) {
     
     // TODO: replace 3 with request array's actual size
     parse_data(csv_content, 3);
+
+    Result result = run_simulation(cycles, cachelines, cacheline_size, cache_latency, memory_latency, tf_filename, input_filename);
 
     return 0;
 }
