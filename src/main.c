@@ -4,7 +4,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <stdbool.h>
-#include <cstdint>
+#include <stdint.h>
 #include <sys/stat.h>
 
 struct Request {
