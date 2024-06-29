@@ -13,6 +13,7 @@ MainMemory* main_memory = new MainMemory();
 SC_MODULE(CACHE_MODULE) {
 
     // sc_vector<sc_in<Request>> request;
+    sc_signal<int> data;
     sc_in<bool> clk;
     Result result;
 
@@ -77,7 +78,7 @@ SC_MODULE(CACHE_MODULE) {
                 if (current_request.we) {
                     cache->write_to_cache(current_request.addr, cache_config, current_request.data);
                 } else {
-                    cache->read_from_cache(current_request.addr, cache_config);
+                    data = cache->read_from_cache(current_request.addr, cache_config);
                 }
                 cache_latency_count = 0;
             }
