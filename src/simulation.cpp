@@ -84,9 +84,9 @@ void matrix_multiply_with_cache(CACHE_MODULE* cache_module, MainMemory* main_mem
         for (int j = 0; j < MATRIX_SIZE; j++) {
             resultMatrix[i][j] = 0;
             for (int k = 0; k < MATRIX_SIZE; k++) {
-                // Read elements from cache
-                int addrA = i * MATRIX_SIZE + k;
-                int addrB = MATRIX_SIZE * MATRIX_SIZE + k * MATRIX_SIZE + j;
+                // // Read elements from cache
+                // int addrA = i * MATRIX_SIZE + k;
+                // int addrB = MATRIX_SIZE * MATRIX_SIZE + k * MATRIX_SIZE + j;
 
                 // Perform multiplication
                 int valueA = cache_module->data.read();
