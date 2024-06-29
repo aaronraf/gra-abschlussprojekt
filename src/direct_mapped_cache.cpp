@@ -34,3 +34,5 @@ void DirectMappedCache::write_to_cache(int address, CacheConfig cache_config, in
     current_entry.data[cache_address.offset] = data_to_write;
     main_memory->write_to_ram(address, data_to_write);
 }
+
+// adit kontol

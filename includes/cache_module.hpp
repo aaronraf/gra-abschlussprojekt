@@ -131,4 +131,5 @@ SC_MODULE(CACHE_MODULE) {
 // }
 
 // // g++ -I../../systemc/include -L../../systemc/lib -o cache_module cache_module.cpp direct_mapped_cache.cpp four_way_lru_cache.cpp lru_cache.cpp main_memory.cpp -lsystemc
+//adit memek
 #endif
