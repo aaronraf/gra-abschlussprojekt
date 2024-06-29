@@ -1,3 +1,6 @@
+#ifndef CACHEMODULE_HPP
+#define CACHEMODULE_HPP
+
 #include <systemc>
 #include <iostream>
 #include "../includes/cache_module_includes.hpp"
@@ -88,42 +91,43 @@ SC_MODULE(CACHE_MODULE) {
 
 
 // int sc_main() {
-//     // sc_clock clk("clk", 1, SC_SEC);
+//     sc_clock clk("clk", 1, SC_SEC);
 
-//     // // write to cache
-//     // Request request[3];
-//     // request[0].we = 1;
-//     // request[0].addr = 0x12;
-//     // request[0].data = 5;
+//     // write to cache
+//     Request request[3];
+//     request[0].we = 1;
+//     request[0].addr = 0x12;
+//     request[0].data = 5;
 
-//     // request[0].we = 1;
-//     // request[0].addr = 0x39;
-//     // request[0].data = 7;
+//     request[0].we = 1;
+//     request[0].addr = 0x39;
+//     request[0].data = 7;
 
-//     // request[0].we = 1;
-//     // request[0].addr = 0x5;
-//     // request[0].data = 41;
+//     request[0].we = 1;
+//     request[0].addr = 0x5;
+//     request[0].data = 41;
 
-//     // // read from cache
-//     // request[0].we = 0;
-//     // request[0].addr = 0x12;
+//     // read from cache
+//     request[0].we = 0;
+//     request[0].addr = 0x12;
 
-//     // request[0].we = 0;
-//     // request[0].addr = 0x39;
+//     request[0].we = 0;
+//     request[0].addr = 0x39;
 
-//     // request[0].we = 0;
-//     // request[0].addr = 0x5;
+//     request[0].we = 0;
+//     request[0].addr = 0x5;
 
-//     // Result result;
-//     // CACHE_MODULE cache("cache", 3, 1, 32, 4, 1, 2, 3, request, nullptr);
-//     // cache.clk(clk);
+//     Result result;
+//     CACHE_MODULE cache("cache", 3, 1, 32, 4, 1, 2, 3, request, nullptr);
+//     cache.clk(clk);
 
-//     // sc_start(3, SC_SEC);
+//     sc_start(3, SC_SEC);
 
-//     // cout << cache.result.cycles << endl;
+//     cout << cache.result.cycles << endl;
 
 //     return 0;
     
 // }
 
 // // g++ -I../../systemc/include -L../../systemc/lib -o cache_module cache_module.cpp direct_mapped_cache.cpp four_way_lru_cache.cpp lru_cache.cpp main_memory.cpp -lsystemc
+#endif
