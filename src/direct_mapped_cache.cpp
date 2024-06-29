@@ -6,7 +6,7 @@ void DirectMappedCache::replace(int address, CacheEntry current_entry, int numbe
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
 
     for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
-        current_entry.data[offset] = main_memory.read_from_ram(ram_address);
+        current_entry.data[offset] = main_memory->read_from_ram(ram_address);
     }
 }
 
@@ -32,5 +32,5 @@ void DirectMappedCache::write_to_cache(int address, CacheConfig cache_config, in
     }
     
     current_entry.data[cache_address.offset] = data_to_write;
-    main_memory.write_to_ram(address, data_to_write);
+    main_memory->write_to_ram(address, data_to_write);
 }

@@ -83,7 +83,7 @@ void LRUCache::write_to_cache(int address, CacheAddress cache_address, CacheConf
     // write to lru and ram and update lru to mru
     Node* node = map[cache_address.tag];
     node->data[cache_address.offset] = data_to_write;       // write O(1)
-    main_memory.write_to_ram(address, data_to_write);       // write-through: write directly to memory
+    main_memory->write_to_ram(address, data_to_write);       // write-through: write directly to memory
     push_to_head(node);                                     // replace O(1)
 }
 
@@ -115,7 +115,7 @@ void LRUCache::replace_lru(int address, int cache_address_tag, CacheConfig cache
     int last_address_to_fetch = start_address_to_fetch + cache_config.number_of_offset - 1;
     
     for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
-        new_node->data[offset] = main_memory.read_from_ram(ram_address);
+        new_node->data[offset] = main_memory->read_from_ram(ram_address);
     }
 }
 
