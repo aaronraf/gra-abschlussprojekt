@@ -126,7 +126,7 @@ void parse_data(const char* content, struct Request request[], int number_of_req
         // printf("Addr: %x\n", addr);
         // printf("Data: %d\n", data);
 
-        request[i].we = temp;
+        request[i].we = temp[0] == 'W' ? 1 : 0;
         request[i].addr = addr;
         request[i].data = data;
 
@@ -136,7 +136,7 @@ void parse_data(const char* content, struct Request request[], int number_of_req
     free(content_copy);
 }
 
-int main(int argc, char const* argv[]) {
+int main(int argc, char* argv[]) {
     const char* progname = argv[0];
     
     // if (argc == 1) {
@@ -144,7 +144,7 @@ int main(int argc, char const* argv[]) {
     //     return EXIT_FAILURE;
     // }
 
-    int opt;
+    char opt;
     int option_index = 0;
     int cycles = 0;
     bool direct_mapped = false;

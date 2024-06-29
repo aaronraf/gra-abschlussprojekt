@@ -2,7 +2,7 @@
 #include <queue>
 #include <iostream>
 #include "../includes/structs.hpp"
-#include "cache_module.cpp"
+#include "../includes/cache_module.hpp"
 
 using namespace std;
 using namespace sc_core;
@@ -23,7 +23,7 @@ Result run_simulation(int cycles, bool direct_mapped,  unsigned cachelines, unsi
                         unsigned cache_latency, int memory_latency, size_t num_requests, Request requests[], const char* tf_filename, 
                         const char* input_filename) {
     Result result;
-    CACHE cache ("cache", cycles, direct_mapped, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename);
+    CACHE_MODULE cache ("cache", cycles, direct_mapped, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename);
     cache.update();
     result.cycles = cache.cycles;
 

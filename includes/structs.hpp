@@ -1,7 +1,7 @@
 #ifndef STRUCTS_HPP
 #define STRUCTS_HPP
 
-#include <cstdint>
+#include <stdint.h>
 #include <stdio.h>
 
 typedef struct Request {
