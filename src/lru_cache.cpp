@@ -4,9 +4,8 @@
 #include <algorithm> // std::fill()
 #include "../includes/four_way_lru_cache.hpp"
 #include "../includes/cache_config.hpp"
+#include "../includes/main_memory_global.hpp"
 using namespace std;
-
-MainMemory main_memory;
 
 LRUCache::Node::Node(int number_of_offset) : next(nullptr), prev(nullptr) {
     fill(data, data + number_of_offset, 0); // initialize array to 0

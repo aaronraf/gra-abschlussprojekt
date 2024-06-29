@@ -1,6 +1,5 @@
 #include "../includes/direct_mapped_cache.hpp"
-
-MainMemory main_memory;
+#include "../includes/main_memory_global.hpp"
 
 void DirectMappedCache::replace(int address, CacheEntry current_entry, int number_of_offset) {
     int start_address_to_fetch = (address / number_of_offset) * number_of_offset;

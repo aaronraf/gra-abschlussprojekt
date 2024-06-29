@@ -5,6 +5,8 @@
 using namespace std;
 using namespace sc_core;
 
+MainMemory* main_memory = new MainMemory();
+
 SC_MODULE(CACHE_MODULE) {
 
     // sc_vector<sc_in<Request>> request;
