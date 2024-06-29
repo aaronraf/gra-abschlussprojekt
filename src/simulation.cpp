@@ -9,21 +9,21 @@ using namespace sc_core;
 
 // struct Result run_simulation(
 //     int cycles,
-//     int directMapped,           // 0 for direct mapped, other for four-way
+//     int direct_mapped,           // 0 for direct mapped, other for four-way
 //     unsigned cacheLines,
 //     unsigned cacheLineSize,
 //     unsigned cacheLatency,
 //     unsigned memoryLatency,
-//     size_t numRequests,
-//     struct Request requests[numRequests],
+//     size_t num_requests,
+//     struct Request requests[num_requests],
 //     const char* tracefile
 // );
 
-Result run_simulation(int cycles, bool directMapped,  unsigned cachelines, unsigned cacheline_size, 
-                        unsigned cache_latency, int memory_latency, size_t numRequests, Request requests[], const char* tf_filename, 
+Result run_simulation(int cycles, bool direct_mapped,  unsigned cachelines, unsigned cacheline_size, 
+                        unsigned cache_latency, int memory_latency, size_t num_requests, Request requests[], const char* tf_filename, 
                         const char* input_filename) {
     Result result;
-    CACHE cache ("cache", cycles, directMapped, cachelines, cacheline_size, cache_latency, memory_latency, numRequests, requests, tf_filename);
+    CACHE cache ("cache", cycles, direct_mapped, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename);
     cache.update();
     result.cycles = cache.cycles;
 

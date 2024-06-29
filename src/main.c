@@ -8,8 +8,7 @@
 #include <sys/stat.h>
 #include "../includes/structs.hpp"
 
-extern Result run_simulation(int cycles, unsigned cachelines, unsigned cacheline_size, unsigned cache_latency, int memory_latency, const char* tf_filename, const char* input_filename);
-
+extern Result run_simulation(int cycles, bool direct_mapped, unsigned cachelines, unsigned cacheline_size, unsigned cache_latency, int memory_latency, size_t num_requests, Request requests[], const char* tf_filename, const char* input_filename);
 // struct Request {
 //     unsigned addr;
 //     unsigned data;
@@ -159,7 +158,7 @@ int main(int argc, char const* argv[]) {
     const char* csv_path = "../examples/inputs.csv";
     char* csv_content;
     size_t num_requests = 256;
-    Request requests[numRequests];
+    Request requests[num_requests];
 
     struct option long_options[] = {
         {"cycles", required_argument, 0, 'c'},
@@ -225,7 +224,8 @@ int main(int argc, char const* argv[]) {
     // TODO: add request array as second parameter and replace 3 with request array's actual size
     parse_data(csv_content, requests, num_requests);
 
-    Result result = run_simulation(cycles, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename, input_filename);
+    Result result = run_simulation(cycles, direct_mapped, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename, input_filename);
+    // Result result = run_simulation(cycles, cachelines, cacheline_size, cache_latency, memory_latency, num_requests, requests, tf_filename, input_filename);
     printf("Cycles: %zu\n", result.cycles);
     printf("Misses: %zu\n", result.misses);
     printf("Hits: %zu\n", result.hits);
