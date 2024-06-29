@@ -2,6 +2,7 @@
 #include <queue>
 #include <iostream>
 #include "../includes/structs.hpp"
+#include "cache_module.cpp"
 
 using namespace std;
 using namespace sc_core;
@@ -18,12 +19,14 @@ using namespace sc_core;
 //     const char* tracefile
 // );
 
-Result run_simulation(int cycles, unsigned cachelines, unsigned cacheline_size, 
-                        unsigned cache_latency, int memory_latency, const char* tf_filename, 
+Result run_simulation(int cycles, bool directMapped,  unsigned cachelines, unsigned cacheline_size, 
+                        unsigned cache_latency, int memory_latency, size_t numRequests, Request requests[], const char* tf_filename, 
                         const char* input_filename) {
     Result result;
-    result.cycles = cycles;
-    
+    CACHE cache ("cache", cycles, directMapped, cachelines, cacheline_size, cache_latency, memory_latency, numRequests, requests, tf_filename);
+    cache.update();
+    result.cycles = cache.cycles;
+
     return result;
 }
 
