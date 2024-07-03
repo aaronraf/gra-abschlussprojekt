@@ -99,6 +99,12 @@ void matrix_multiply_with_cache(CACHE_MODULE* cache_module, MainMemory* main_mem
 
 int sc_main(int argc, char* argv[]) {
     sc_clock clk("clk", 1, SC_NS);
+    sc_signal<uint32_t> addr;
+    sc_signal<uint32_t> data;
+    sc_signal<int> we;
+    sc_signal<size_t> cycles;
+    sc_signal<size_t> hits;
+    sc_signal<size_t> misses;
 
     // Instantiate main memory
     MainMemory* main_memory = new MainMemory();
@@ -110,6 +116,21 @@ int sc_main(int argc, char* argv[]) {
     Request requests[2 * MATRIX_SIZE * MATRIX_SIZE]; // Adjust size according to your needs
     CACHE_MODULE cache_module("cache_module", 1000, 1, 32, 4, 1, 2, 2 * MATRIX_SIZE * MATRIX_SIZE, requests, nullptr);
     cache_module.clk(clk);
+
+    // Tracefile initialization
+    sc_trace_file* tracefile = sc_create_vcd_trace_file(argv[1]);
+    if (tracefile == NULL) {
+        fprintf(stderr, "Tracefile not opened.");
+        exit(EXIT_FAILURE);
+    }
+    sc_trace(tracefile, clk, "Clock");
+    sc_trace(tracefile, addr, "Address");
+    sc_trace(tracefile, data, "Data");
+    sc_trace(tracefile, we, "WE");
+    sc_trace(tracefile, cycles, "Cycles");
+    sc_trace(tracefile, misses, "Misses");
+    sc_trace(tracefile, hits, "Hits");
+    sc_trace(tracefile, misses, "Misses");
 
     // Start simulation
     sc_start();
@@ -126,6 +147,8 @@ int sc_main(int argc, char* argv[]) {
         cout << "\n";
     }
 
+    // Close tracefile
+    sc_close_vcd_trace_file(tracefile);
     return 0;
 }
 
@@ -139,14 +162,3 @@ Result run_simulation(int cycles, bool direct_mapped,  unsigned cachelines, unsi
 
     return result;
 }
-
-// int sc_main(int argc, char* argv[]) {
-//     sc_trace_file* tracefile = sc_create_vcd_trace_file(argv[1]);
-//     if (tracefile == NULL) {
-//         fprintf(stderr, "Tracefile not opened.");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     sc_close_vcd_trace_file(tracefile);
-//     return 0;
-// }
