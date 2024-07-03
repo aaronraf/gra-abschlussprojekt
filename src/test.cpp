@@ -34,7 +34,7 @@
         request[5].addr = 0x5;
 
         Result result;
-        CACHE_MODULE cache("cache", 6, 1, 32, 4, 1, 2, 6, request, nullptr);
+        CACHE_MODULE cache("cache", 6, 0, 32, 4, 1, 2, 6, request, nullptr);
         cache.clk(clk);
 
         sc_start(6, SC_SEC);

@@ -37,6 +37,10 @@ SC_MODULE(CACHE_MODULE) {
                 unsigned cacheLatency, unsigned memoryLatency, size_t numRequests,
                 Request requests[], const char* tracefile) : sc_module(name) {
         
+        result.cycles = 0;
+        result.hits = 0;
+        result.misses = 0;
+        result.primitiveGateCount = 0;
         this->cycles = cycles;
         this->directMapped = directMapped;
         this->cacheLines = cacheLines;
