@@ -11,10 +11,10 @@ struct CacheAddress {
     uint32_t offset;
 
     // TODO: change data type
-    CacheAddress(uint32_t address, CacheConfig cache_config) {
+    CacheAddress(uint32_t address, CacheConfig &cache_config) {
         offset = address & cache_config.number_of_offset;
         index = (address >> cache_config.number_of_offset) & cache_config.number_of_index;
-        tag = index >> cache_config.number_of_index; 
+        tag = address >> (cache_config.number_of_offset + cache_config.number_of_index); 
     }
 };
 

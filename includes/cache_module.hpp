@@ -5,7 +5,7 @@
 #include <iostream>
 #include "../includes/cache_module_includes.hpp"
 #include <cstdint>
-#define CACHE_ADDRESS_LENGTH 32;
+//#define CACHE_ADDRESS_LENGTH = 32;
 using namespace std;
 using namespace sc_core;
 
@@ -52,9 +52,9 @@ SC_MODULE(CACHE_MODULE) {
         }   
 
         // determine number of index, offset, tag
-        cache_config.number_of_index = (int) pow(2, ceil(log2((directMapped == 1) ? cacheLines : cacheLines / 4)));
-        cache_config.number_of_offset = (int) pow(2, ceil(log2(cacheLineSize)));
-        cache_config.number_of_tag = CACHE_ADDRESS_LENGTH - number_of_index - number_of_offset;
+        cache_config.number_of_index = ceil(log2((directMapped == 1) ? cacheLines : cacheLines / 4));
+        cache_config.number_of_offset = ceil(log2(cacheLineSize));
+        cache_config.number_of_tag = 32 - cache_config.number_of_index - cache_config.number_of_offset;
 
         // poly cache
         // TODO: one main memory for all
@@ -88,6 +88,7 @@ SC_MODULE(CACHE_MODULE) {
 
                     data = cache->read_from_cache(current_request.addr, cache_config);
                     //cout << "current_request.addr: " << current_request.addr << endl;
+                    wait(SC_ZERO_TIME);
                     cout << "cache_module_data: " << data << endl;
                 }
                 cache_latency_count = 0;
