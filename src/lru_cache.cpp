@@ -5,6 +5,7 @@
 #include "../includes/four_way_lru_cache.hpp"
 #include "../includes/cache_config.hpp"
 #include "../includes/main_memory_global.hpp"
+#include <cstdint>
 using namespace std;
 
 LRUCache::Node::Node(int number_of_offset) : next(nullptr), prev(nullptr) {
@@ -31,7 +32,7 @@ void LRUCache::remove(Node* node) {
     next->prev = prev;
 }
 
-LRUCache::LRUCache(CacheConfig cache_config) {
+LRUCache::LRUCache(CacheConfig &cache_config) {
     // add head and tail
     head = new Node(cache_config.number_of_offset);
     tail = new Node(cache_config.number_of_offset);
@@ -56,7 +57,7 @@ LRUCache::~LRUCache() {
     }
 }
 
-int LRUCache::read_from_cache(int address, CacheAddress cache_address, CacheConfig cache_config) {
+int LRUCache::read_from_cache(uint32_t address, CacheAddress cache_address, CacheConfig &cache_config) {
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
         replace_lru(address, cache_address.tag, cache_config);
@@ -71,7 +72,7 @@ int LRUCache::read_from_cache(int address, CacheAddress cache_address, CacheConf
     return node->data[cache_address.offset]; // read O(1)
 }
 
-void LRUCache::write_to_cache(int address, CacheAddress cache_address, CacheConfig cache_config, int data_to_write) {
+void LRUCache::write_to_cache(uint32_t address, CacheAddress cache_address, CacheConfig &cache_config, int data_to_write) {
     // if not found -> replace
     if (map.find(cache_address.tag) == map.end()) { // map.find() returns map.end() if not found
         replace_lru(address, cache_address.tag, cache_config);
@@ -87,7 +88,7 @@ void LRUCache::write_to_cache(int address, CacheAddress cache_address, CacheConf
     push_to_head(node);                                     // replace O(1)
 }
 
-void LRUCache::replace_lru(int address, int cache_address_tag, CacheConfig cache_config) {
+void LRUCache::replace_lru(uint32_t address, uint32_t cache_address_tag, CacheConfig &cache_config) {
     // replace lru node with new node at lru place (tail)
     Node* lru_node = tail->prev;
     Node* new_node = new Node(cache_config.number_of_offset);
@@ -111,10 +112,10 @@ void LRUCache::replace_lru(int address, int cache_address_tag, CacheConfig cache
     // 2 -> 0 1 2 3    2 / 4 = 0   0 * 4 = 0     fetch 0 - 3
     // 5 -> 4 5 6 7    5 / 4 = 1   1 * 4 = 4     fetch 4 - 7
     // 9 -> 8 9 10 11  9 / 4 = 2   2 * 4 = 8     fetch 8 - 11
-    int start_address_to_fetch = (address / cache_config.number_of_offset) * cache_config.number_of_offset;
-    int last_address_to_fetch = start_address_to_fetch + cache_config.number_of_offset - 1;
+    uint32_t start_address_to_fetch = (address / cache_config.number_of_offset) * cache_config.number_of_offset;
+    uint32_t last_address_to_fetch = start_address_to_fetch + cache_config.number_of_offset - 1;
     
-    for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
+    for (uint32_t ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
         new_node->data[offset] = main_memory->read_from_ram(ram_address);
     }
 }

@@ -1,5 +1,6 @@
 #include "../includes/direct_mapped_cache.hpp"
 #include "../includes/main_memory_global.hpp"
+#include <iostream>
 
 DirectMappedCache::DirectMappedCache() {
     for (int i = 0; i < 100; ++i) {
@@ -11,7 +12,7 @@ DirectMappedCache::DirectMappedCache() {
     }
 }
 
-void DirectMappedCache::replace(int address, CacheEntry* current_entry, int number_of_offset) {
+void DirectMappedCache::replace(uint32_t address, CacheEntry* current_entry, int number_of_offset) {
     int start_address_to_fetch = (address / number_of_offset) * number_of_offset;
     int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
 
@@ -20,19 +21,28 @@ void DirectMappedCache::replace(int address, CacheEntry* current_entry, int numb
     }
 }
 
-int DirectMappedCache::read_from_cache(int address, CacheConfig cache_config) {
+int DirectMappedCache::read_from_cache(uint32_t address, CacheConfig &cache_config) {
     CacheAddress cache_address(address, cache_config);
+    std::cout << "index: " << cache_address.index << std::endl;
+    std::cout << "tag: " << cache_address.tag << std::endl;
+    std::cout << "offsett: " << cache_address.offset << std::endl;
+
     CacheEntry* current_entry = cache_entry[cache_address.index];
+    //bool ram = false;
+    std::cout << "dmc data: " << current_entry->data[cache_address.offset] << std::endl;
     
+    // check if tag is in cache
     if (current_entry->tag != cache_address.tag) {
         replace(address, current_entry, cache_config.number_of_offset);
         current_entry->tag = cache_address.tag;
+        //ram = true;
     }
     
+    //std::cout << "ram bool: " << ram << std::endl;
     return current_entry->data[cache_address.offset];
 }
 
-void DirectMappedCache::write_to_cache(int address, CacheConfig cache_config, int data_to_write) {
+void DirectMappedCache::write_to_cache(uint32_t address, CacheConfig &cache_config, int data_to_write) {
     CacheAddress cache_address(address, cache_config);
     CacheEntry* current_entry = cache_entry[cache_address.index];
     

@@ -4,6 +4,7 @@
 #include <systemc>
 #include <iostream>
 #include "../includes/cache_module_includes.hpp"
+#include <cstdint>
 #define CACHE_ADDRESS_LENGTH 32;
 using namespace std;
 using namespace sc_core;
@@ -34,7 +35,7 @@ SC_MODULE(CACHE_MODULE) {
     SC_CTOR(CACHE_MODULE);
     CACHE_MODULE(sc_module_name name, int cycles, int directMapped, unsigned cacheLines, unsigned cacheLineSize,
                 unsigned cacheLatency, unsigned memoryLatency, size_t numRequests,
-                Request request[], const char* tracefile) : sc_module(name) {
+                Request requests[], const char* tracefile) : sc_module(name) {
         
         this->cycles = cycles;
         this->directMapped = directMapped;
@@ -45,8 +46,10 @@ SC_MODULE(CACHE_MODULE) {
         this->numRequests = numRequests;
         this->requests = new Request[numRequests];
         for (size_t i = 0; i < numRequests; i++) {
-            this->requests[i] = requests[i];
-        }
+            memcpy(&this->requests[i], &requests[i], sizeof(Request));
+            //cout << "Copying request[" << i << "]: addr = " << requests[i].addr << " but " << this->requests[i].addr <<endl;
+
+        }   
 
         // determine number of index, offset, tag
         cache_config.number_of_index = (int) pow(2, ceil(log2((directMapped == 1) ? cacheLines : cacheLines / 4)));
@@ -73,12 +76,19 @@ SC_MODULE(CACHE_MODULE) {
     void update() {
         for (int i = 0, cache_latency_count = cacheLatency; i < cycles; i++, cache_latency_count++){
             Request current_request = requests[i];
-            // TODO : update cache and miss, RAM, cache exception from ram, pass main_memory and result to access operation
+            //cout << "Processing request[" << i << "]: addr = " << current_request.addr << endl;            // TODO : update cache and miss, RAM, cache exception from ram, pass main_memory and result to access operation
             if (cache_latency_count == cacheLatency) {
                 if (current_request.we) {
                     cache->write_to_cache(current_request.addr, cache_config, current_request.data);
                 } else {
+                    cout << "current addr: " << current_request.addr << endl;
+                    cout << "no. ind: " << cache_config.number_of_index << endl;
+                    cout << "no. tag: " << cache_config.number_of_tag << endl;
+                    cout << "no. offset: " << cache_config.number_of_offset << endl;
+
                     data = cache->read_from_cache(current_request.addr, cache_config);
+                    //cout << "current_request.addr: " << current_request.addr << endl;
+                    cout << "cache_module_data: " << data << endl;
                 }
                 cache_latency_count = 0;
             }

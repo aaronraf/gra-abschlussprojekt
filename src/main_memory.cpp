@@ -5,7 +5,7 @@ using namespace std;
 // TODO: change this
 const int MEMORY_SIZE = 100;
 
-int MainMemory::read_from_ram(int address) {
+int MainMemory::read_from_ram(uint32_t address) {
     if (address < 0 || address >= MEMORY_SIZE) {
         cerr << "Error: Invalid memory address " << address << endl;
         return -1;
@@ -13,7 +13,7 @@ int MainMemory::read_from_ram(int address) {
     return memory[address];
 }
 
-void MainMemory::write_to_ram(int address, int data_to_write) {
+void MainMemory::write_to_ram(uint32_t address, int data_to_write) {
     if (address < 0 || address >= MEMORY_SIZE) {
         cerr << "Error: Invalid memory address " << address << endl;
     }
