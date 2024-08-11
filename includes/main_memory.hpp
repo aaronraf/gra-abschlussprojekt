@@ -5,13 +5,16 @@
 
 class MainMemory {
 private:
-    // TODO: change size
-    int memory[100];
+    uint8_t* data;
+    uint32_t memorySize;
 
 public: 
-    int read_from_ram(uint32_t address);
+    MainMemory(unsigned cacheAddressLength);
+    ~MainMemory();
 
-    void write_to_ram(uint32_t address, int data_to_write);
+    uint8_t read_from_ram(uint32_t address);
+    
+    void write_to_ram(uint32_t address, uint8_t data_to_write);
 };
 
 #endif

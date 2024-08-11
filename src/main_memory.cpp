@@ -1,21 +1,32 @@
-#include "../includes/main_memory.hpp"
 #include <iostream>
+#include <cmath>
+
+#include "../includes/main_memory.hpp"
+
 using namespace std;
 
-// TODO: change this
-const int MEMORY_SIZE = 100;
+MainMemory::MainMemory(unsigned cacheAddressLength) {
+    memorySize = static_cast<uint32_t>(pow(2, cacheAddressLength));
+    data = new uint8_t[memorySize];
+    
+}
 
-int MainMemory::read_from_ram(uint32_t address) {
-    if (address < 0 || address >= MEMORY_SIZE) {
+MainMemory::~MainMemory() {
+    delete[] data;
+}
+
+uint8_t MainMemory::read_from_ram(uint32_t address) {
+    if (address >= memorySize) {
         cerr << "Error: Invalid memory address " << address << endl;
         return -1;
     }
-    return memory[address];
+
+    return data[address];
 }
 
-void MainMemory::write_to_ram(uint32_t address, int data_to_write) {
-    if (address < 0 || address >= MEMORY_SIZE) {
+void MainMemory::write_to_ram(uint32_t address, uint8_t dataToWrite) {
+    if (address >= memorySize) {
         cerr << "Error: Invalid memory address " << address << endl;
     }
-    memory[address] = data_to_write;
+    data[address] = dataToWrite;
 }   

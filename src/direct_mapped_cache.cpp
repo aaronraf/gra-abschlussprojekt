@@ -1,58 +1,99 @@
+#include <iostream>
+#include <cmath>
+
 #include "../includes/direct_mapped_cache.hpp"
 #include "../includes/main_memory_global.hpp"
-#include <iostream>
 
-DirectMappedCache::DirectMappedCache() {
-    for (int i = 0; i < 100; ++i) {
-        cache_entry[i] = new CacheEntry(); // Allocate new CacheEntry object
-        cache_entry[i]->tag = 0; // Initialize tag to 0
-        for (int j = 0; j < 100; ++j) {
-            cache_entry[i]->data[j] = 0; // Initialize data to 0
-        }
+using namespace std;
+
+DirectMappedCache::DirectMappedCache(unsigned numOfCacheLines, CacheConfig cacheConfig) : numOfCacheLines(numOfCacheLines) {
+    cacheLine = new CacheLine[numOfCacheLines];
+
+    // Allocate data[] with a size depending on number of offset bits
+    for (unsigned i = 0; i < numOfCacheLines; i++) {
+        cacheLine[i].data = new uint8_t[static_cast<uint32_t>(pow(2, cacheConfig.numberOfOffsetBits))]; 
     }
 }
 
-void DirectMappedCache::replace(uint32_t address, CacheEntry* current_entry, int number_of_offset) {
-    int start_address_to_fetch = (address / number_of_offset) * number_of_offset;
-    int last_address_to_fetch = start_address_to_fetch + number_of_offset - 1;
-
-    for (int ram_address = start_address_to_fetch, offset = 0; ram_address <= last_address_to_fetch; ram_address++, offset++) { // O(1)
-        current_entry->data[offset] = main_memory->read_from_ram(ram_address);
+DirectMappedCache::~DirectMappedCache() {
+    for (unsigned i = 0; i < numOfCacheLines; i++) {
+        delete[] cacheLine[i].data;
     }
+    delete[] cacheLine;
 }
 
-int DirectMappedCache::read_from_cache(uint32_t address, CacheConfig &cache_config) {
-    CacheAddress cache_address(address, cache_config);
-    std::cout << "index: " << cache_address.index << std::endl;
-    std::cout << "tag: " << cache_address.tag << std::endl;
-    std::cout << "offsett: " << cache_address.offset << std::endl;
+uint32_t DirectMappedCache::read_from_cache(uint32_t address, CacheConfig cacheConfig, Result &result) {
+    CacheAddress cacheAddress(address, cacheConfig);
+    CacheLine &currentCacheLine = cacheLine[cacheAddress.index];
 
-    CacheEntry* current_entry = cache_entry[cache_address.index];
-    //bool ram = false;
-    std::cout << "dmc data: " << current_entry->data[cache_address.offset] << std::endl;
-    
-    // check if tag is in cache
-    if (current_entry->tag != cache_address.tag) {
-        replace(address, current_entry, cache_config.number_of_offset);
-        current_entry->tag = cache_address.tag;
-        //ram = true;
+    // Replace when cold miss or when tag is different, and update number of misses/hits
+    bool found = true;
+    if (currentCacheLine.isFirstTime || currentCacheLine.tag != cacheAddress.tag) {
+        replace(address, currentCacheLine, cacheConfig.numberOfOffsetBits, cacheConfig);
+        currentCacheLine.isFirstTime = false;
+        result.misses++;
+        found = false;
     }
-    
-    //std::cout << "ram bool: " << ram << std::endl;
-    return current_entry->data[cache_address.offset];
+    if (found) {
+        result.hits++;
+    }
+
+    // Merge 4 bytes of data from 4 consecutive offsets into a single 32-bit-unsigned integer
+    uint8_t data1 = currentCacheLine.data[cacheAddress.offset];
+    uint8_t data2 = currentCacheLine.data[cacheAddress.offset + 1];
+    uint8_t data3 = currentCacheLine.data[cacheAddress.offset + 2];
+    uint8_t data4 = currentCacheLine.data[cacheAddress.offset + 3];
+    uint32_t dataToRead = merge_data_to_uint32(data1, data2, data3, data4);
+
+    return dataToRead;
 }
 
-void DirectMappedCache::write_to_cache(uint32_t address, CacheConfig &cache_config, int data_to_write) {
-    CacheAddress cache_address(address, cache_config);
-    CacheEntry* current_entry = cache_entry[cache_address.index];
-    
-    if (current_entry->tag != cache_address.tag) {
-        replace(address, current_entry, cache_config.number_of_offset);
-        current_entry->tag = cache_address.tag;
+void DirectMappedCache::write_to_cache(uint32_t address, CacheConfig cacheConfig, uint32_t dataToWrite, Result &result) {
+    CacheAddress cacheAddress(address, cacheConfig);
+    CacheLine &currentCacheLine = cacheLine[cacheAddress.index];
+
+    // Replace when cold miss or when tag is different, and update number of misses/hits
+    bool found = true;
+    if (currentCacheLine.isFirstTime || currentCacheLine.tag != cacheAddress.tag) {
+        replace(address, currentCacheLine, cacheConfig.numberOfOffsetBits, cacheConfig);
+        currentCacheLine.isFirstTime = false;
+        result.misses++;
+        found = false;
     }
-    
-    current_entry->data[cache_address.offset] = data_to_write;
-    main_memory->write_to_ram(address, data_to_write);
+    if (found) {
+        result.hits++;
+    }
+
+    // Split a 32-bit-unsigned integer into 4 bytes of data with consecutive offsets according to little-endian
+    uint8_t byteOfData = static_cast<uint8_t>(dataToWrite & 0xFF);
+    currentCacheLine.data[cacheAddress.offset] = byteOfData;
+    mainMemory->write_to_ram(address, byteOfData);
+
+    byteOfData = static_cast<uint8_t>((dataToWrite >> 8) & 0xFF);
+    currentCacheLine.data[cacheAddress.offset + 1] = byteOfData;
+    mainMemory->write_to_ram(address + 1, byteOfData);
+
+    byteOfData = static_cast<uint8_t>((dataToWrite >> 16) & 0xFF);
+    currentCacheLine.data[cacheAddress.offset + 2] = byteOfData;
+    mainMemory->write_to_ram(address + 2, byteOfData);
+
+    byteOfData = static_cast<uint8_t>((dataToWrite >> 24) & 0xFF);
+    currentCacheLine.data[cacheAddress.offset + 3] = byteOfData;
+    mainMemory->write_to_ram(address + 3, byteOfData);
 }
 
-// adit kontol
+void DirectMappedCache::replace(uint32_t address, CacheLine &currentCacheLine, uint32_t numberOfOffset, CacheConfig cacheConfig) {
+    uint32_t totalOffset = static_cast<uint32_t>(pow(2, numberOfOffset));
+
+    // Fetch a block of data from the main memory
+    uint32_t startAddressToFetch = (address / totalOffset) * totalOffset;
+    uint32_t lastAddressToFetch = startAddressToFetch + totalOffset - 1;
+
+    for (uint32_t ramAddress = startAddressToFetch, offset = 0; ramAddress <= lastAddressToFetch; ramAddress++, offset++) {
+        currentCacheLine.data[offset] = mainMemory->read_from_ram(ramAddress);
+    }
+
+    // Update tag
+    CacheAddress newAddress(startAddressToFetch, cacheConfig);
+    currentCacheLine.tag = newAddress.tag;
+}

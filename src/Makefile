@@ -4,23 +4,23 @@
 
 # Entry point for the program
 C_SRCS = main.c
-CPP_SRCS = simulation.cpp
+CPP_SRCS = simulation.cpp cache_base.cpp cache_module.cpp direct_mapped_cache.cpp four_way_lru_cache.cpp main_memory.cpp
 
 # Object files located in the output directory outside src
-C_OBJS = $(patsubst %.c,../output/%.o,$(C_SRCS))
-CPP_OBJS = $(patsubst %.cpp,../output/%.o,$(CPP_SRCS))
+C_OBJS = $(patsubst %.c,../out/%.o,$(C_SRCS))
+CPP_OBJS = $(patsubst %.cpp,../out/%.o,$(CPP_SRCS))
 
-# Assignment task files
-# HEADERS := 
+# Header files directory
+HEADERS_DIR := ../includes/
 
 # Target name
-TARGET := cachesim
+TARGET := ../out/simulation
 
 # Path to your systemc installation (adjust as needed)
 SCPATH = ../../systemc
 
 # Additional flags for the compiler
-CXXFLAGS := -std=c++14 -I$(SCPATH)/include -L$(SCPATH)/lib -lsystemc -lm -Wall -Wextra
+CXXFLAGS := -std=c++14 -I$(SCPATH)/include -I$(HEADERS_DIR) -L$(SCPATH)/lib -lsystemc -lm -Wall
 
 # ---------------------------------------
 # CONFIGURATION END
@@ -52,14 +52,14 @@ endif
 all: debug
 
 # Ensure the output directory exists
-$(shell mkdir -p ../output)
+$(shell mkdir -p ../out)
 
 # Rule to compile .c files to .o files
-../output/%.o: %.c
+../out/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Rule to compile .cpp files to .o files
-../output/%.o: %.cpp
+../out/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Debug build
@@ -77,6 +77,7 @@ $(TARGET): $(C_OBJS) $(CPP_OBJS)
 # Clean up
 clean:
 	rm -f $(TARGET)
-	rm -rf ../output/*.o
+	rm -rf ../out/*.o
+	rm -rf ../out/*.vcd
 
 .PHONY: all debug release clean
